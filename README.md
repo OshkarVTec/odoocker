@@ -36,6 +36,9 @@ In essence, Odoocker isn't just another tool, it's a philosophy. So, whether you
   - [6. Colorize your branches](#6-colorize-your-branches)
 - [DB Connection](#db-connection)
   - [PgAdmin](#pgadmin-container) 
+- [Adding modules](#adding-modules)
+  - [From Github](#from-github)
+  - [From source code](#from-source-code)
 - [Deployment Process](#deployment-process)
 
 # Quick Setup Guide:
@@ -246,6 +249,30 @@ docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-co
 ```
 
 If your instance has pgAdmin, make sure you adapt your aliases to this configuration.
+
+# Adding modules
+
+## From Github
+
+You can add Odoo modules directly from Github repositories (public or private) using environment variables and the project folder structure.
+
+1. Make sure your Github user and token are set in the `.env` file:
+   ```
+   GITHUB_USER=your_user
+   GITHUB_ACCESS_TOKEN=your_token
+   ```
+2. Add the repository URL to the `odoo/third-party-addons.txt` file if you want it to be cloned automatically when building the container. Example:
+   ```
+   public https://github.com/youruser/your-odoo-addon.git
+   ```
+3. If the repository is private, ensure your token has read permissions.
+
+## From source code
+
+If you have the source code of an Odoo module locally, simply copy it to the appropriate folder:
+
+1. Copy the module directory to `odoo/extra-addons`.
+2. Make sure the path is included in the `ADDONS_PATH` variable in your `.env` file (by default, all main addon folders are included).
 
 # Deployment Process
 Note: the deployment process is easier & faster with aliases.
