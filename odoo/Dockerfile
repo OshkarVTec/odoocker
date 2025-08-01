@@ -53,7 +53,6 @@ RUN apt-get update && apt-get install -y \
     git \
     git-man \
     less \
-    libcbor0.8 \
     libcurl3-gnutls \
     libedit2 \
     liberror-perl \
@@ -64,20 +63,28 @@ RUN apt-get update && apt-get install -y \
     xauth \
     # Remove apt lists
     && rm -rf /var/lib/apt/lists/*
+#---------------------#
+#   PIP Dependencies  #
+#---------------------#
+# Install venv support
+USER root
+RUN apt-get update && apt-get install -y \
+    python3.12-venv \
+    && rm -rf /var/lib/apt/lists/*
 
-#---------------------#
-#   PIP Dependecies   #
-#---------------------#
-# Copy & Install PIP requirements
 COPY --chown=odoo:odoo ./odoo/requirements.txt /tmp/requirements.txt
+RUN python3 -m venv /opt/odoo-venv \
+    && /opt/odoo-venv/bin/pip install --upgrade pip \
+    && /opt/odoo-venv/bin/pip install -r /tmp/requirements.txt \
+    && rm /tmp/requirements.txt
 
-RUN python3 -m pip install -r /tmp/requirements.txt && \
-    rm /tmp/requirements.txt
+RUN /opt/odoo-venv/bin/pip install psycopg2-binary
+
+ENV PATH="/opt/odoo-venv/bin:$PATH"
 
 #--------------------------------------------#
 #    Odoo Enterprise + Third Party Addons    #
 #--------------------------------------------#
-# Create third-party-addons directory and clone them
 COPY --chown=odoo:odoo ./odoo/clone-addons.sh /
 COPY --chown=odoo:odoo ./odoo/third-party-addons.txt /
 RUN /clone-addons.sh
