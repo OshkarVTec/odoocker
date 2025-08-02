@@ -67,20 +67,11 @@ RUN apt-get update && apt-get install -y \
 #   PIP Dependencies  #
 #---------------------#
 # Install venv support
-USER root
-RUN apt-get update && apt-get install -y \
-    python3.12-venv \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=odoo:odoo ./odoo/requirements.txt /tmp/requirements.txt
-RUN python3 -m venv /opt/odoo-venv \
-    && /opt/odoo-venv/bin/pip install --upgrade pip \
-    && /opt/odoo-venv/bin/pip install -r /tmp/requirements.txt \
-    && rm /tmp/requirements.txt
 
-RUN /opt/odoo-venv/bin/pip install psycopg2-binary
-
-ENV PATH="/opt/odoo-venv/bin:$PATH"
+RUN python3 -m pip install -r /tmp/requirements.txt --break-system-packages && \
+    rm /tmp/requirements.txt
 
 #--------------------------------------------#
 #    Odoo Enterprise + Third Party Addons    #
